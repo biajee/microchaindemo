@@ -1845,6 +1845,8 @@ var loadScript = ( function() {
 if(JH.browserandroid()||JH.browserios()||JH.browserwx()){
 	if (window.location.href.indexOf("newmoodada")>=0 ) {
 		window.location.href = "m/newmoodada.html";
+	} else if (window.location.href.indexOf("oc2.moac.io")>=0 ) {
+	//	window.location.href = "m/newmoodada.html";
 	} else {
 		window.location.href = "m/";
 	}
