@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
+
 const spawn = require('child_process').spawn;
 
 ConsoleMe = {};
@@ -33,6 +34,12 @@ Meteor.startup(() => {
       sharedConsole.insert({args: args, createdAt: new Date});
     }
   });
+  
+  import { Monitor } from '../mongo/mongo.js'
+  Meteor.publish('Monitor',function (){
+    // console.log(Meteor.userId() + "  " + this.userId);
+    return Monitor.find({});
+})
 
   Meteor.publish("_console", function() {
     var self = this;

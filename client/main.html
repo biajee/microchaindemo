@@ -379,8 +379,12 @@ please feel free to send an email to us.
 
 <template name="realdemo">
   <button>Create the MicroChain</button>
-  <p>You've pressed the button {{counter}} times.</p>
-  <a href="test.html">test</a>
-  <textarea>{{log}}</textarea>
+  <button id='rm'>rm</button>
+
+  <ul>
+  {{#each messages}}
+   <li>{{message}}</li>
+  {{/each}}
+  </ul>
 </template>
 
