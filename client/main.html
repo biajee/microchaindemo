@@ -169,7 +169,7 @@ please feel free to send an email to us.
         <!--<div class="pr linkto">
           <div class="pt30" url="https://www.moac.io">MOAC website: www.moac.io</div>
         </div>-->
-        {{> register}}
+        
         {{> login}}
         <div class="answer">
           <span class="icon icon-www2 pa" style="left:-35px;top:30px;"></span>
@@ -320,8 +320,8 @@ please feel free to send an email to us.
 
 <template name="login">
     <form>
-        <input type="user" name="loginUser"><br>
-        <input type="password" name="loginPassword"><br>
+        <div style="width: 30px;">Email</div><input type="user" name="loginUser"><br>
+        <div style="width: 30px;">Password</div><input type="password" name="loginPassword"><br>
         <input type="submit" value="Login">
     </form>
 </template>
