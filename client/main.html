@@ -274,14 +274,22 @@ please feel free to send an email to us.
 </div>
 <div class="back-top ico ico-back-top dn animated"></div></body>
 
-<template name="realdemo">
+  <template name="realdemo">
   <button>Create the MicroChain</button>
-  <button id='rm'>rm</button>
+  <button id='check'>check end</button>
+  <button id='test'>scroll</button>
 
+  <div id='head' class="content_head">Microchain Release</div>
+  <div id='terminal' class="content">
   <ul>
   {{#each messages}}
-   <li>{{message}}</li>
+   <li style="margin-left:10px">{{message}}</li>
   {{/each}}
   </ul>
+  </div>
+
+
+  
+   
 </template>
 

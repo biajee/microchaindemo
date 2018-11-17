@@ -2,3 +2,39 @@ body {
   padding: 10px;
   font-family: sans-serif;
 }
+
+div#terminal {
+	background-color:rgba(0, 0, 0, 0.08); 
+	width: 70%;
+	height:300px;
+    overflow:auto;
+    margin:0 auto 10px auto;
+    padding:5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    font-family: "Gill Sans", sans-serif;
+    box-shadow: 2px 2px 2px #aaaaaa;
+}
+
+
+div#head {
+	background-color:rgba(0, 0, 0, 0.08); 
+	width: 70%;
+	height:20px;
+	margin:10px auto 0 auto;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    text-align: center;
+    font-family: "Gill Sans", sans-serif;
+    
+}
+
+div.content_head {
+  color:#35D4CE;
+  font-weight: bold;
+}
+
+
+div.content {
+  color:#35D4CE;
+}
