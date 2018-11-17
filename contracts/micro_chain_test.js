@@ -4,7 +4,6 @@ const solc = require('solc');
 
 const vnodeUri = 'http://127.0.0.1:8545';
 var address = '';
-
 let chain3 = new Chain3();
 chain3.setProvider(new chain3.providers.HttpProvider(vnodeUri));
 
@@ -39,6 +38,8 @@ var output = solc.compile(contract, 1);
 
 var abi = output.contracts[':SubChainProtocolBase'].interface;
 var bin = output.contracts[':SubChainProtocolBase'].bytecode;
+
+
 
 var protocol = "POR";
 var bmin = 3;
@@ -96,6 +97,8 @@ var input = {
 };
 
 var output = solc.compile({sources: input}, 1);
+
+
 
 var abi = output.contracts[':SubChainBase'].interface;
 var bin = output.contracts[':SubChainBase'].bytecode;
