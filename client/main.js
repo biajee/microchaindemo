@@ -7,32 +7,32 @@ import './main.html';
 var subHandle;
 subHandle = Meteor.subscribe("_console");
 
-var scroll = 1000;
-flag = true;
+var scroll = 2000;
 var sharedConsole = new Meteor.Collection('_clientConsole');
 sharedConsole.find().observe({
   added: function(doc) {
     //var args = ["Server (" + doc.createdAt.toUTCString() + "):"];
-    while(flag){
-         
+    // while(flag){
+
       //alert(doc.args.length);
         let log = JSON.parse(doc.args[0]);
+        //alert(log);
+        if (log == "all Done!!!\n"){
+            alert('done')
+            Session.set('disableBtn', false);
+             //Meteor.call('rmAll');
+         }
         //args.push(JSON.parse(doc.args[i]));
         Meteor.call('addMsg',log);
         //$("#terminal").scrollTop(100); 
         //alert(scroll);
-        scroll+=10;
-        // $("#terminal").scrollTop(scroll);
+        scroll+=100;
+        $("#terminal").scrollTop(scroll);
         
-        // Meteor.call('allDone',function(e,r){
-        //   if(r){
-        //     alert('all done');
-        //     flag = false;
-        //   } 
-        // })
-      }
+        
+      // }
 
-      return;
+      // return;
     // for (var i = 0, ln = doc.args.length; i < ln; i++) {
         
     //     let log = JSON.parse(doc.args[i]);
@@ -43,27 +43,38 @@ sharedConsole.find().observe({
   }
 });
 
+
 Template.realdemo.onCreated(function realdemoOnCreated() {
   // counter starts at 0
   Meteor.subscribe('Monitor');
+  Session.set('disableBtn', false);
   Meteor.call('rmAll');
 });
 
 Template.realdemo.helpers({
   messages(){
     return Monitor.find({}).fetch();
+  },
+  disableBtn(){
+    //alert(Session.get('disableBtn'));
+   //return Monitor.findOne({message:'all Done!!!'})==null;
+  
+   return Session.get('disableBtn');
   }
 });
 
 Template.realdemo.events({
-  'click #check'(event, instance){
-    Meteor.call('allDone',function(e, r){
-      alert(r);
-    });
-  },
 
-  'click button'(event, instance) {
-    // increment the counter when button is clicked
+  'click button'(){
+    Session.set('disableBtn', true);
+  },
+  // 'click #check'(){
+  //   let btnStatus = Session.get('disableBtn');
+  //  // TemplateVar.set('disableBtn', !btnStatus);
+  // },
+  'click button#create'() {
+    //TemplateVar.set('disableBtn', false);
+    //alert(TemplateVar.get('disableBtn'));
     Meteor.call('runCode', function(e, r){
         console.log('test');
         if (!e){
@@ -76,8 +87,5 @@ Template.realdemo.events({
     });
   },
 
-  // 'click #test'(){
-  //   $("#terminal").scrollTop($("#terminal").offset().top);
-  // }
 
 });

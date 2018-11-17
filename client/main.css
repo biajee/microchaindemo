@@ -4,37 +4,57 @@ body {
 }
 
 div#terminal {
-	background-color:rgba(0, 0, 0, 0.08); 
+	background-color:black; 
 	width: 70%;
 	height:300px;
     overflow:auto;
-    margin:0 auto 10px auto;
+    margin:0 auto 10px 10px;
     padding:5px;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     font-family: "Gill Sans", sans-serif;
     box-shadow: 2px 2px 2px #aaaaaa;
+    color:white;
+    opacity: 0.9;
 }
 
 
 div#head {
-	background-color:rgba(0, 0, 0, 0.08); 
+	background-color:#c5c5c5; 
 	width: 70%;
 	height:20px;
-	margin:10px auto 0 auto;
+	margin:10px auto 0 10px;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
     text-align: center;
     font-family: "Gill Sans", sans-serif;
-    
-}
-
-div.content_head {
-  color:#35D4CE;
-  font-weight: bold;
+    box-shadow: 2px 2px 2px #aaaaaa;
+    opacity: 0.9;
 }
 
 
-div.content {
-  color:#35D4CE;
+button {
+  border: 1px solid #0066cc;
+  background-color: #0099cc;
+  color: #ffffff;
+  padding: 5px 10px;
 }
+
+button:hover {
+  border: 1px solid #0099cc;
+  background-color: #00aacc;
+  color: #ffffff;
+  padding: 5px 10px;
+  cursor:pointer;
+}
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+}
+
+
+
