@@ -146,10 +146,13 @@ please feel free to send an email to us.
         <!--<div class="pr linkto">
           <div class="pt30" url="https://www.moac.io">MOAC website: www.moac.io</div>
         </div>-->
+        {{> register}}
+        {{> login}}
         <div class="answer">
           <span class="icon icon-www2 pa" style="left:-35px;top:30px;"></span>
-          
+          {{#if currentUser}}
 <p>{{> realdemo}}</p>
+          {{/if}}
 
         </div>
         <div class="mb120">
@@ -291,3 +294,19 @@ please feel free to send an email to us.
    
 </template>
 
+
+<template name="login">
+    <form>
+        <input type="user" name="loginUser"><br>
+        <input type="password" name="loginPassword"><br>
+        <input type="submit" value="Login">
+    </form>
+</template>
+
+<template name="register">
+    <form>
+        <input type="user" name="registerUser">
+        <input type="password" name="registerPassword">
+        <input type="submit" value="Register">
+    </form>
+</template>

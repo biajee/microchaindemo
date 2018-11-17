@@ -1,8 +1,62 @@
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Monitor } from '../mongo/mongo.js'
- 
+import { Accounts } from 'meteor/accounts-base'; 
+
 import './main.html';
+
+global.gUser = null;
+// ServiceConfiguration.configurations.upsert(
+//   { service: 'github' },
+//   {
+//     $set: {
+//       loginStyle: "popup",
+//       clientId: "biajee"
+//     }
+//   }
+// );
+// Meteor.startup(function(){
+//   Accounts.ui.config({
+//     passwordSignupFields: "USERNAME_ONLY"
+//   });
+// });
+
+// Accounts.ui.config({
+//   passwordSignupFields: "USERNAME_ONLY"
+// });
+Template.login.events({
+    'submit form': function(event) {
+        event.preventDefault();
+        var userVar = event.target.loginUser.value;
+        var passwordVar = event.target.loginPassword.value;
+        console.log("Form submitted.");
+        Meteor.loginWithPassword(userVar, passwordVar);
+    }
+});
+
+Template.register.events({
+    'submit form': function(event) {
+        event.preventDefault();
+        var userVar = event.target.registerUser.value;
+        var passwordVar = event.target.registerPassword.value;
+        Accounts.createUser({
+            email: userVar,
+            password: passwordVar
+        });
+    }
+});
+// Accounts.onLogin(console.log);
+// Meteor.loginWithPassword(user, password, [callback])
+
+// Meteor.loginWithGithub({
+//   requestPermissions: ['user', 'public_repo']
+// }, (error) => {
+//   if (error) {
+//     Session.set('errorMessage', error.reason || 'Unknown error');
+//   } else {
+//     console.log('we are logged in');
+//   }
+// });
 
 var subHandle;
 subHandle = Meteor.subscribe("_console");
