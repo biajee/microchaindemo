@@ -2,7 +2,7 @@ const Chain3 = require('chain3');
 const fs = require('fs');
 const solc = require('solc');
 
-const vnodeUri = 'http://127.0.0.1:8545';
+const vnodeUri = 'http://127.0.0.1:8999';
 var address = '';
 let chain3 = new Chain3();
 chain3.setProvider(new chain3.providers.HttpProvider(vnodeUri));
@@ -138,19 +138,19 @@ subchainbase = subchainbaseContract.at(chain3.mc.getTransactionReceipt(subchainb
 //
 //==========================================================================
 console.log("send mc to scs1, scs2, scs3 and scsm");
-scs1="0x3e0025B9fCDC70B7cf63A6c087345aFFE2Df7301";
+scs1="0x6806344fd25bea9a038f5fe122bb6ac33eea7812";
 sendtx(chain3.mc.accounts[0], scs1, 20);
 waitBalance(scs1, 20);
 
-scs2="0xb441fc1eBf52474D7B9B61D978bC87484C21bAa4";
+scs2="0x21ad8520c9ddb6b982b9a01e915f8900a65560a3";
 sendtx(chain3.mc.accounts[0], scs2, 20);
 waitBalance(scs2, 20);
 
-scs3="0xF70ac426BD2AFfFd718D08bAaEA72C08817433d8";
+scs3="0x61f97cc6c1457f3bf31e249a6d68d1fc06298947";
 sendtx(chain3.mc.accounts[0], scs3, 20);
 waitBalance(scs3, 20);
 
-scsm="0xf3c60706f42C705A1e5E9C47535DF2e0da819bD7";
+scsm="0xe543dd0656ed71984d31b9d18692fd6bc9ce43d0";
 sendtx(chain3.mc.accounts[0], scsm, 20);
 waitBalance(scsm, 20);
 
@@ -216,8 +216,8 @@ console.log("Please go to testnet.moac.io to monitor the microchain.\n");
 sleep(1000);
 console.log("Subchain Base Address: " + subchainbase.address + "\n");
 sleep(1000);
-console.log("IP: \n");
-console.log("Port: \n");
+console.log("IP: 52.42.170.217\n");
+console.log("Port: 8548\n");
 
 function registertopool(contractadd, scsaddress) {
     var registerdata = "0x4420e486000000000000000000000000"+scsaddress.substring(2);
