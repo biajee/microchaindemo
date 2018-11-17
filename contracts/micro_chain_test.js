@@ -20,12 +20,12 @@ if(!chain3.isConnected()){
     console.log(accounts);
     
     address = coinbase;
-    //if (chain3.personal.unlockAccount(address, 'test', 0)) {
-    //    console.log(`${address} is unlocaked`);
-    //}else{
-    //    console.log(`unlock failed, ${address}`);
-    //    throw new Error('unlock failed ' + address);
-    //}
+    if (chain3.personal.unlockAccount(address, 'test', 0)) {
+       console.log(`${address} is unlocaked`);
+    }else{
+       console.log(`unlock failed, ${address}`);
+       throw new Error('unlock failed ' + address);
+    }
 }
 
 //==========================================================================
@@ -135,19 +135,19 @@ subchainbase = subchainbaseContract.at(chain3.mc.getTransactionReceipt(subchainb
 //
 //==========================================================================
 console.log("send mc to scs1, scs2, scs3 and scsm");
-scs1="0xC1EA88A1D7b0AC187c48C52AB33C549F8C8E53d8";
+scs1="0x3e0025B9fCDC70B7cf63A6c087345aFFE2Df7301";
 sendtx(chain3.mc.accounts[0], scs1, 20);
 waitBalance(scs1, 20);
 
-scs2="0xcF9808c4EE31398DCEd14939DbE43226411f3847";
+scs2="0xb441fc1eBf52474D7B9B61D978bC87484C21bAa4";
 sendtx(chain3.mc.accounts[0], scs2, 20);
 waitBalance(scs2, 20);
 
-scs3="0x20134495e363018F45f988B1E94894c049584352";
+scs3="0xF70ac426BD2AFfFd718D08bAaEA72C08817433d8";
 sendtx(chain3.mc.accounts[0], scs3, 20);
 waitBalance(scs3, 20);
 
-scsm="0xF59bDEc9FA7018AE089b984c0F0004Bd324D928d";
+scsm="0xf3c60706f42C705A1e5E9C47535DF2e0da819bD7";
 sendtx(chain3.mc.accounts[0], scsm, 20);
 waitBalance(scsm, 20);
 
@@ -207,7 +207,14 @@ sleep(15000);
 console.log("register monitor");
 subchainRegisterAsMonitor(scsm, bmin);
 
-console.log("all Done!!!");
+console.log("All done!!!\n");
+sleep(1000);
+console.log("Please go to testnet.moac.io to monitor the microchain.\n");
+sleep(1000);
+console.log("Subchain Base Address: " + subchainbase.address + "\n");
+sleep(1000);
+console.log("IP: \n");
+console.log("Port: \n");
 
 function registertopool(contractadd, scsaddress) {
     var registerdata = "0x4420e486000000000000000000000000"+scsaddress.substring(2);
