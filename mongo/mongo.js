@@ -14,7 +14,12 @@ Meteor.methods({
         });
     },
 
-    rmAll(){
+    rmAll(){ 
     	Monitor.remove({});
+    },
+
+    allDone(){
+        //console.log(Monitor.findOne({message:'all Done!!!'}));
+        return Monitor.findOne({message:'all Done!!!'})!=null;
     }
 })
