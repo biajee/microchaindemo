@@ -216,8 +216,8 @@ console.log("Please go to testnet.moac.io to monitor the microchain.\n");
 sleep(1000);
 console.log("Subchain Base Address: " + subchainbase.address + "\n");
 sleep(1000);
-console.log("IP: \n");
-console.log("Port: \n");
+console.log("IP: 52.42.170.217\n");
+console.log("Port: 8548\n");
 
 function registertopool(contractadd, scsaddress) {
     var registerdata = "0x4420e486000000000000000000000000"+scsaddress.substring(2);
