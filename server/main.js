@@ -63,7 +63,7 @@ Meteor.startup(() => {
 });
 
 Meteor.methods({
-  runCode: function () {
+  runCode: function (name) {
     // This method call won't return immediately, it will wait for the
     // asynchronous code to finish, so we call unblock to allow this client
     // to queue other method calls (see Meteor docs)
@@ -82,7 +82,7 @@ Meteor.methods({
     });
     return future.wait();*/
     var path = process.env.PWD + "/contracts/micro_chain_test.js"
-    const ls = spawn("node",[path]);
+    const ls = spawn("node",[path, name]);
     ls.stdout.on('data', (data)=>{
       console.log(`${data}`);
     });

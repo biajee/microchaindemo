@@ -1,3 +1,7 @@
+const args = process.argv.slice(2);
+console.log(args[0]);
+console.log("All done!!!\n");
+/*
 const Chain3 = require('chain3');
 const fs = require('fs');
 const solc = require('solc');
@@ -288,3 +292,4 @@ function sleep(milliseconds) {
       }
     }
 }
+*/
