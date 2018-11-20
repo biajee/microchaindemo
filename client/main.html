@@ -138,18 +138,44 @@ please feel free to send an email to us.
         </div>-->
         <div class="answer">
           <span class="icon icon-www2 pa" style="left:-35px;top:30px;"></span>
-          <p>Here are the steps of making MicroChain with just one button click</p>
+          <p>Here are the steps of making MicroChain. And, at the bottom, we demonstrated how you can combine all these steps into just one button click.</p>
           <br>
+          <p>1. Download vnode and scs code here:</p>
+          <a href="https://github.com/MOACChain/moac-core/releases">https://github.com/MOACChain/moac-core/releases</a>
+          <br>
+          <p>2. Setup Vnode and scs accordingly:</p>
+          <a href="https://github.com/MOACChain/moac-core/wiki">https://github.com/MOACChain/moac-core/wiki</a>
+          <br>
+          <p>3. Download the script and solidity code here.</p>
+          <a href="files/micro_chain_test.js">micro_chain_test.js</a><br>
+          <a href="files/SubChainBase.sol">SubChainBase.sol</a><br>
+          <a href="files/SubChainProtocolBase.sol">SubChainProtocolBase.sol</a><br>
+          <a href="files/VnodeProtocolBase.sol">VnodeProtocolBase.sol</a>
+          <p>Change the scs1, scs2, scs3, scsm addresses in micro_chain_test.js files according to the keystore generated automatically under each scs box.</p>
+          <br>
+          <p>4. Create an npm project for micro_chain_test.js file. Making sure to add the following modules</p>
+          <p>npm install --save chain3</p>
+          <p>npm install --save solc@0.4.24</p>
+          <br>
+          <p>5. Run the following command to create the MicroChain.</p>
+          <p>node micro_chain_test.js</p>
+          <br>
+          <p>Have fun!</p>
+          <br>
+          <p>Also, here is the example of MooDada microchain app. Feel free to try it.</p>
           <a href="files/moodada.testnet.1.0.0.apk" alt="">Download MooDada Android for Testnet</a>
         </div>
         <div class="f18 fb pt60" id="faq3">THE Button (DEMO)</div>
         <!--<div class="pr linkto">
           <div class="pt30" url="https://www.moac.io">MOAC website: www.moac.io</div>
         </div>-->
+        
+        {{> login}}
         <div class="answer">
           <span class="icon icon-www2 pa" style="left:-35px;top:30px;"></span>
-          
+          {{#if currentUser}}
 <p>{{> realdemo}}</p>
+          {{/if}}
 
         </div>
         <div class="mb120">
@@ -291,3 +317,19 @@ please feel free to send an email to us.
    
 </template>
 
+
+<template name="login">
+    <form>
+        <div style="width: 30px;">Email</div><input type="user" name="loginUser"><br>
+        <div style="width: 30px;">Password</div><input type="password" name="loginPassword"><br>
+        <input type="submit" value="Login">
+    </form>
+</template>
+
+<template name="register">
+    <form>
+        <input type="user" name="registerUser">
+        <input type="password" name="registerPassword">
+        <input type="submit" value="Register">
+    </form>
+</template>

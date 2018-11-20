@@ -82,8 +82,11 @@ Meteor.methods({
     });
     return future.wait();*/
     var path = process.env.PWD + "/contracts/micro_chain_test.js"
-    const ls = spawn("node",[path, name]);
+    const ls = spawn("node", [path, name]);
     ls.stdout.on('data', (data)=>{
+      console.log(`${data}`);
+    });
+    ls.stderr.on('data', (data)=>{
       console.log(`${data}`);
     });
   }
