@@ -170,12 +170,12 @@ please feel free to send an email to us.
           <div class="pt30" url="https://www.moac.io">MOAC website: www.moac.io</div>
         </div>-->
         
-        {{> login}}
+        <!--{{> login}}-->
         <div class="answer">
           <span class="icon icon-www2 pa" style="left:-35px;top:30px;"></span>
-          {{#if currentUser}}
-<p>{{> realdemo}}</p>
-          {{/if}}
+          <!--{{#if currentUser}}-->
+          <p>{{> realdemo}}</p>
+          <!-- {{/if}} -->
 
         </div>
         <div class="mb120">
@@ -301,7 +301,10 @@ please feel free to send an email to us.
 <div class="back-top ico ico-back-top dn animated"></div></body>
 
   <template name="realdemo">
-  <button id='create' disabled={{disableBtn}}>Create the MicroChain</button>
+   <div  >
+  <input id="name" placeholder="Please input your name" style="margin-top: 25px"/>
+  </div>
+  <div style="margin-top: 20px"><button id='create' disabled={{disableBtn}}>Create the MicroChain</button></div>
  
   <div id='head'>Microchain Release</div>
   <div id='terminal'>

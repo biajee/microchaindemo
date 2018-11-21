@@ -129,7 +129,6 @@ Template.realdemo.events({
   'click button#create'() {
     //TemplateVar.set('disableBtn', false);
     //alert(TemplateVar.get('disableBtn'));
-    TemplateVar.set('name', "你好");  //<--put this into input box event
     Meteor.call('runCode', TemplateVar.get('name'), function(e, r){
         console.log('test');
         if (!e){
@@ -141,6 +140,11 @@ Template.realdemo.events({
         }
     });
   },
+  'keyup input#name'(event){
+    TemplateVar.set('name', event.target.value);  //<--put this into input box event
+    console.log(TemplateVar.get('name'));
+  }
+
 
 
 });

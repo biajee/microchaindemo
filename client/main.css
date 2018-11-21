@@ -56,5 +56,30 @@ button[disabled]{
   cursor: not-allowed;
 }
 
+input{
+  font-family:Helvetica, Arial, sans-serif;
+  font-size:12pt;
+  margin:0;
+  padding:0;
+  width:100%;
+}
+
+input{
+  font-size:12pt;
+  border:none;
+  outline:none;
+  position:absolute;
+  top:0;
+  left:0;
+  display:block;
+  background:transparent;
+  z-index:2;
+  border-bottom:1px solid #ccc;
+  text-indent:$padding-horizontal;
+}
+
+
+
+
 
 
