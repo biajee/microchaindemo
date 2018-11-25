@@ -62,7 +62,8 @@ Template.register.events({
 var sharedConsole = new Meteor.Collection('_clientConsole');
 
 Template.realdemo.onCreated(function realdemoOnCreated() {
-  Meteor.subscribe("_console");
+  Meteor.subscribe("_clientConsole");
+  Meteor.call('clearConsole');
   Session.set('disableBtn', false);
 });
 
@@ -70,9 +71,9 @@ Template.realdemo.onCreated(function realdemoOnCreated() {
 Template.realdemo.helpers({
   messages(){
     var logs = sharedConsole.find().fetch();
-
+    console.log(logs);
     var messages = _.map(logs, function(log){
-      let line = JSON.parse(log.args[0]);
+      let line = log.args;
       if (line == "All done!!!\n\n"){
             alert('done')
             Session.set('disableBtn', false);
@@ -85,6 +86,7 @@ Template.realdemo.helpers({
 
     return messages;
   },
+  
   disableBtn(){
    return Session.get('disableBtn');
   }
