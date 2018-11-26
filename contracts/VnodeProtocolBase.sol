@@ -22,6 +22,8 @@ contract VnodeProtocolBase {
         uint state; // one of VnodeStatus
         uint256 registerBlock;
         uint256 withdrawBlock;
+        string rpclink;
+        address via;
         string link;
     }
 
@@ -51,6 +53,8 @@ contract VnodeProtocolBase {
         nd.state = uint(VnodeStatus.performing);
         nd.registerBlock = block.number + PEDNING_BLOCK_DELAY;
         nd.withdrawBlock = 2 ** 256 - 1;
+        nd.rpclink = "";
+        nd.via = address(0);
         nd.link = "";
         
         vnodeStore.push(nd);
@@ -64,7 +68,7 @@ contract VnodeProtocolBase {
     }
 
     // register for vnode
-    function register(address vnode, string link) public payable returns (bool) {
+    function register(address vnode, address via, string link, string rpclink) public payable returns (bool) {
         //already registered or not enough bond
         require( vnodeList[vnode] == 0 && msg.value >= bondMin*10**18 );
 
@@ -74,6 +78,8 @@ contract VnodeProtocolBase {
         nd.state = uint(VnodeStatus.performing);
         nd.registerBlock = block.number + PEDNING_BLOCK_DELAY;
         nd.withdrawBlock = 2 ** 256 - 1;
+        nd.rpclink = rpclink;
+        nd.via = via;
         nd.link = link;
         
         vnodeStore.push(nd);
@@ -140,7 +146,7 @@ contract VnodeProtocolBase {
 
         uint index = randness%vnodeCount;
         //skip dummy
-        if(index ==0 ){
+        if(index ==0){
             index++;
         }
         if( isPerforming(vnodeStore[index].from) ) {

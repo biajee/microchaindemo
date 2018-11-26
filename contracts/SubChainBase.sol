@@ -13,15 +13,14 @@ contract SCSRelay {
 }
 
 //ATO new
-contract MarketableToken {
-    function initToken(address[] addr, uint256[] bals, uint256[] lock) public ;
-    function refresh() public;
-    function buyMintToken(address useraddr, uint256 value) public payable returns (uint256);
+contract DirectExchangeToken {
+    function buyMintToken(address useraddr, uint256 value) public payable returns (uint256, uint256);
     function sellMintTokenPre(address useraddr, uint256 amount) public returns (uint256);
     function sellMintToken(address useraddr, uint256 amount) public returns (bool);
     function requestEnterMicrochain(address useraddr, uint256 amount) public returns (bool);
     function redeemFromMicroChain(address[] addr, uint256[] bals) public returns (bool);
     function totalSupply() public view returns (uint256);
+    function withdrawTokenMoac(address useraddr, uint256 moac);
 }
 
 
@@ -77,7 +76,7 @@ contract SubChainBase {
         uint[] amount;
         uint[] time;
     }
-    
+
     struct TransRecords {
         uint[] enterAmount;
         uint[] entertime;
@@ -105,6 +104,12 @@ contract SubChainBase {
         address[] nodeList; 
         address[] nodesToJoin;
     }
+
+     struct MonitorInfo {
+        address from; // address as id
+        uint256 bond; // value
+        string link;  // ip:prort
+    } 
 
     address public protocol;
     uint public minMember;
@@ -181,12 +186,13 @@ contract SubChainBase {
     holdings internal holdingPool;
     uint public holdingPoolPos = 0;
     uint public MAX_USERADDR_TO_SUBCHAIN = 100;
-
+    
     // inidicator of fund needed
     uint public contractNeedFund;
-    
-    mapping(address=>TransRecords) internal records;
 
+    mapping(address=>TransRecords) internal records;
+    MonitorInfo[] public monitors;
+    
     uint public MAX_DELETE_NUM = 5;
 
     //events
@@ -211,8 +217,8 @@ contract SubChainBase {
         owner = msg.sender;
 
         flushInRound = flushRound;
-        if (flushInRound <= 100) {
-            flushInRound = 100;
+        if (flushInRound <= 40) {
+            flushInRound = 40;
         }
         lastFlushBlk = 2 ** 256 - 1;
 
@@ -306,20 +312,46 @@ contract SubChainBase {
         return 0;
     }
 
-    function registerAsMonitor(address monitor) public payable { 
+    function registerAsMonitor(address monitor, string link) public payable { 
         require(msg.value >= MONITOR_MIN_FEE);
         require(nodesWatching[monitor] == 0); 
         require(monitor != address(0));
         nodesWatching[monitor] = msg.value;
+
+        // Add MonitorInfo        
+        monitors.push(MonitorInfo(monitor, msg.value, link));
+               
         SCS_RELAY.notifySCS(address(this), uint(SCSRelayStatus.regAsMonitor));
     }
 
+    function getMonitorInfo() public view returns (address[], string[]) {
+        uint cnt = monitors.length;
+        address[] memory addrlist = new address[](cnt);
+        string[] memory strlist = new string[](cnt);
+        uint i = 0;
+        for (i = 0; i < cnt; i++) {
+            addrlist[i] = monitors[i].from;
+            strlist[i] = monitors[i].link;
+        }
+
+        return (addrlist, strlist);
+    }
+
     function removeMonitorInfo(address monitor) public {
-	    if (nodesWatching[monitor] > 0) {
-            // withdraw                
-            monitor.transfer(nodesWatching[monitor]);
-            nodesWatching[monitor] = 0;
-            delete nodesWatching[monitor];
+        uint i = 0;
+        uint cnt = monitors.length;
+        for (i = cnt-1; i >= 0; i--) {
+            if (monitors[i].from == monitor) {
+                // withdraw                
+                monitor.transfer(monitors[i].bond);
+
+                // delete
+                monitors[i] = monitors[cnt-1];
+                delete monitors[cnt-1];
+                monitors.length--;
+                nodesWatching[monitor] = 0;
+                delete nodesWatching[monitor];
+            }
         }
     }
 
@@ -532,7 +564,7 @@ contract SubChainBase {
         //call precompiled code to invoke action on v-node
         SCS_RELAY.notifySCS(address(this), uint(SCSRelayStatus.registerAdd)); // todo David
     }
-
+    
     function getFlushInfo() public view returns (uint) {
         
         for (uint i=1; i <= nodeCount; i++) {
@@ -545,12 +577,12 @@ contract SubChainBase {
         
         return 0;
     }
-
+    
     function getholdingPool() public constant returns (address[]) {
         
         return holdingPool.userAddr;
     }
-    
+
     function getEnteringAmount(address userAddr) public constant returns (uint[] enteringAmt, uint[] enteringtime) {
         uint i;
         uint j = 0;
@@ -573,7 +605,7 @@ contract SubChainBase {
         }
         return (amounts, times);
     }
-
+    
     function getTransRecords(address userAddr) public view returns (TransRecords) {
         
         return records[userAddr];
@@ -707,7 +739,7 @@ contract SubChainBase {
         }
         
         proposals[curhash].distributeFlag = 0;
-
+        
         //notify v-node
         SCS_RELAY.notifySCS(address(this), uint(SCSRelayStatus.createProposal));
 
@@ -724,7 +756,7 @@ contract SubChainBase {
     function voteOnProposal(uint indexInlist, bytes32 hash) public returns (bool) {
         uint gasinit = msg.gas;
         Proposal storage prop = proposals[hash];
-
+        
         require(indexInlist < nodeCount && msg.sender == nodeList[indexInlist]);
         require( tx.gasprice <= MAX_GAS_PRICE );
         //check if sender is part of SCS list
@@ -752,7 +784,7 @@ contract SubChainBase {
                 return false;
             }
         }
-        
+
         //add into voter list
         prop.voters.push(indexInlist);
         prop.votecount++;
@@ -792,7 +824,7 @@ contract SubChainBase {
     function requestProposalAction(uint indexInlist, bytes32 hash) public payable returns (bool) {
         uint gasinit = msg.gas;
         Proposal storage prop = proposals[hash];
-
+        
         require(indexInlist < nodeCount && msg.sender == nodeList[indexInlist]);
         require(prop.flag == uint(ProposalFlag.pending));
         require( tx.gasprice <= MAX_GAS_PRICE );
@@ -846,7 +878,7 @@ contract SubChainBase {
             nodesToDispel.push(badguy);
             scsRelayStatus = uint(SCSRelayStatus.approveProposalBat);
         }
-
+        
         //punish nodePerformance is 0
         if (nodesToDispel.length < MAX_DELETE_NUM) {
             uint num = MAX_DELETE_NUM - nodesToDispel.length;
@@ -875,9 +907,9 @@ contract SubChainBase {
 
         //award via nodes
         //in following request action
-
-        //token redeem
-        //token redeem is done in following request action        
+         //token redeem
+        //token redeem is done in following request action
+        
 
         //remove bad nodes
         applyRemoveNodes(0);
@@ -930,7 +962,7 @@ contract SubChainBase {
 
         return true;
     }
-
+    
     function requestDistributeAction(bytes32 hash) public payable returns (bool) {
         uint gasinit = msg.gas;
         //any one can request
@@ -938,36 +970,30 @@ contract SubChainBase {
         require(prop.distributeFlag == 1);
         uint i;
         address cur;
-
-        //check if contract has enough fund
+         //check if contract has enough fund
         uint totalamount = 0;
         for (i = 0; i < prop.viaNodeAddress.length; i++) {
             totalamount += prop.viaNodeAmount[i];
         }        
-
-        for (i = 0; i < prop.minerAddr.length; i++) {
+         for (i = 0; i < prop.minerAddr.length; i++) {
             cur = prop.minerAddr[i];
             totalamount += currentRefundGas[cur];
             totalamount += prop.distributionAmount[i];
         }
-
-        //if not enough amount, halt proposal
+         //if not enough amount, halt proposal
         if( totalamount > this.balance ) {
             //set global flag
             contractNeedFund += totalamount;
             return false;
         }
-
-        //setflag
+         //setflag
         prop.distributeFlag = 2;
-
-        //doing actual distribution
+         //doing actual distribution
         for ( i = 0; i < prop.viaNodeAddress.length; i++) {
             prop.viaNodeAddress[i].transfer(prop.viaNodeAmount[i]);
             TransferAmount(prop.viaNodeAddress[i], prop.viaNodeAmount[i]);
         }
-
-        for ( i = 0; i < prop.minerAddr.length; i++) {
+         for ( i = 0; i < prop.minerAddr.length; i++) {
             cur = prop.minerAddr[i];
             uint targetGas = currentRefundGas[cur];
             currentRefundGas[cur] = 0;
@@ -978,22 +1004,21 @@ contract SubChainBase {
             TransferAmount(scsBeneficiary[cur], targetGas);
             
         }
-
-
         //redeem tokens
         if (BALANCE != 0 ) {
             removeholdingPool(hash);
             if (prop.ercAddress.length != 0) {
                 redeemFromMicroChain(prop.ercAddress, prop.ercAmount);
+                sellMintTokenPri(prop.ercAddress, prop.ercAmount);
                 for (i = 0; i < prop.ercAddress.length; i++) {
                     records[prop.ercAddress[i]].redeemAmount.push(prop.ercAmount[i]);
                     records[prop.ercAddress[i]].redeemtime.push(now);
                 }
             }
-            
         }
-
+        
         SCS_RELAY.notifySCS(address(this), uint(SCSRelayStatus.distributeProposal));
+        
         //refund current caller
         msg.sender.transfer((gasinit - msg.gas + 15000) * tx.gasprice);
         if (subchainstatus == uint(SubChainStatus.pending)) {
@@ -1001,7 +1026,7 @@ contract SubChainBase {
         }
         return true;
     }
-
+    
     function removeholdingPool(bytes32 hash) private {
         if (proposals[hash].lastApproved != 0x0) {
             uint i;
@@ -1061,6 +1086,13 @@ contract SubChainBase {
         //withdraw to address
         recv.transfer(amount);
     }
+
+    function withdrawTokenMoac(address recv, uint256 amount) public {
+        require(owner == msg.sender);
+
+        DirectExchangeToken token = DirectExchangeToken(tokenAddress);
+        token.withdrawTokenMoac(recv, amount);
+    }
     
     function withdrawal() private {
         subchainstatus = uint(SubChainStatus.close);
@@ -1096,7 +1128,7 @@ contract SubChainBase {
             SCS_RELAY.notifySCS(address(this), uint(SCSRelayStatus.updateLastFlushBlk));
         }
     }
-    
+
     function reset() public {
         require(owner == msg.sender);
         uint blk = lastFlushBlk + flushInRound + nodeCount * 2 * proposalExpiration;
@@ -1286,44 +1318,31 @@ contract SubChainBase {
 
         tokenAddress = addr;
         
-        MarketableToken token = MarketableToken(tokenAddress);
+        DirectExchangeToken token = DirectExchangeToken(tokenAddress);
         BALANCE = token.totalSupply();
         
     }
 
     //ATO new
-    function initToken(address[] addr, uint256[] bals, uint256[] lock) public {
-        require(msg.sender == owner);
-        if( tokenAddress != address(0)) {
-            MarketableToken token = MarketableToken(tokenAddress);
-            token.initToken(addr, bals, lock);
-        }
-    }
-
-    //ATO new
-    function refresh() public {
-        if( tokenAddress != address(0)) {
-            MarketableToken token = MarketableToken(tokenAddress);
-            token.refresh();
-        }        
-    }
-
-    //ATO new
     function buyMintToken() public payable returns (bool){
         if( tokenAddress != address(0)) {
-            MarketableToken token = MarketableToken(tokenAddress);
-            uint256 refund = token.buyMintToken(msg.sender, msg.value);
+            DirectExchangeToken token = DirectExchangeToken(tokenAddress);
+            uint256 refund;
+            uint256 tokens;
+            (refund, tokens) = token.buyMintToken(msg.sender, msg.value);
             tokenAddress.transfer(msg.value-refund);
             if( refund > 0 ) {
                 msg.sender.transfer( refund );
             }
+            bool rsp = requestEnterMicrochain(tokens);
+            return rsp;
         }              
     }
 
     //ATO new    
     function sellMintToken(uint256 amount) public returns (bool){
         if( tokenAddress != address(0)) {
-            MarketableToken token = MarketableToken(tokenAddress);
+            DirectExchangeToken token = DirectExchangeToken(tokenAddress);
             uint256 proceed = token.sellMintTokenPre(msg.sender, amount);
             if( proceed > 0 ) {
                 token.sellMintToken(msg.sender, amount);
@@ -1333,15 +1352,31 @@ contract SubChainBase {
         }              
     }
 
+    function sellMintTokenPri(address[] useraddr,uint256[] amount) private {
+        if( tokenAddress != address(0)) {
+            DirectExchangeToken token = DirectExchangeToken(tokenAddress);
+            for (uint i = 0; i < useraddr.length; i++) {
+                
+                uint256 proceed = token.sellMintTokenPre(useraddr[i], amount[i]);
+                if( proceed > 0 ) {
+                    token.sellMintToken(useraddr[i], amount[i]);
+                    // msg.sender.transfer( proceed );
+                    // return true;
+                }
+            }
+        }              
+    }
+
     //ATO new
     function requestEnterMicrochain(uint256 amount) public returns (bool){
         bool res = false;
         if( tokenAddress != address(0)) {
-            MarketableToken token = MarketableToken(tokenAddress);
+            DirectExchangeToken token = DirectExchangeToken(tokenAddress);
             res = token.requestEnterMicrochain(msg.sender, amount);
             if (res) {
                 holdingPool.userAddr.push(msg.sender);
                 holdingPool.amount.push(amount);
+                holdingPool.time.push(now);
             }
         }              
         return res;
@@ -1350,7 +1385,7 @@ contract SubChainBase {
     //ATO new
     function redeemFromMicroChain(address[] addr, uint256[] bals) private returns (bool){
         if( tokenAddress != address(0)) {
-            MarketableToken token = MarketableToken(tokenAddress);
+            DirectExchangeToken token = DirectExchangeToken(tokenAddress);
             return token.redeemFromMicroChain(addr, bals);
         }              
     }

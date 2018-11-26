@@ -45,6 +45,64 @@ if (!chain3.isConnected()) {
 
 //==========================================================================
 //==========================================================================
+console.log("### Deploying the DirectExchangeToken");
+
+var contractName = "DirectExchangeToken";
+var contract1 = fs.readFileSync(
+  "../../../../../contracts/DirectExchangeToken.sol",
+  "utf8"
+);
+var contract2 = fs.readFileSync(
+  "../../../../../contracts/SafeMath.sol",
+  "utf8"
+);
+var contract3 = fs.readFileSync(
+  "../../../../../contracts/StandardToken.sol",
+  "utf8"
+);
+var contract4 = fs.readFileSync("../../../../../contracts/ERC20.sol", "utf8");
+
+var contracts = {
+  sources: {
+    "../../../../../contracts/DirectExchangeToken.sol": contract1,
+    "../../../../../contracts/SafeMath.sol": contract2,
+    "../../../../../contracts/StandardToken.sol": contract3,
+    "../../../../../contracts/ERC20.sol": contract4
+  }
+};
+
+var output = solc.compile(contracts, 1);
+
+var abi =
+  output.contracts[
+    "../../../../../contracts/DirectExchangeToken.sol:" + contractName
+  ].interface;
+var bin =
+  output.contracts[
+    "../../../../../contracts/DirectExchangeToken.sol:" + contractName
+  ].bytecode;
+
+var supply = 1000000;
+var exchangerate = 1;
+var directexchangeContract = chain3.mc.contract(JSON.parse(abi));
+var directexchange = directexchangeContract.new(supply, exchangerate, {
+  from: chain3.mc.accounts[0],
+  data: "0x" + bin,
+  gas: "9000000"
+});
+
+console.log(
+  "subchainprotocolbaseContract is being deployed transaction: " +
+    directexchange.transactionHash
+);
+waitBlock(directexchange.transactionHash);
+directexchange = directexchangeContract.at(
+  chain3.mc.getTransactionReceipt(directexchange.transactionHash)
+    .contractAddress
+);
+
+//==========================================================================
+//==========================================================================
 console.log("### Deploying the subchainprotocolbaseContract");
 
 var contract = fs.readFileSync(
@@ -126,6 +184,8 @@ var output = solc.compile({ sources: input }, 1);
 var abi = output.contracts[":SubChainBase"].interface;
 var bin = output.contracts[":SubChainBase"].bytecode;
 
+var subchainabi = abi;
+
 console.log("subchainprotocolbase.address:" + subchainprotocolbase.address);
 console.log("vnodeprotocolbase.address:" + vnodeprotocolbase.address);
 
@@ -157,6 +217,28 @@ console.log(
 waitBlock(subchainbase.transactionHash);
 subchainbase = subchainbaseContract.at(
   chain3.mc.getTransactionReceipt(subchainbase.transactionHash).contractAddress
+);
+
+//==========================================================================
+//==========================================================================
+console.log(
+  "### Calling the subchainbase setToken API to point to directexchange"
+);
+sendtx(
+  mainaddress,
+  subchainbase.address,
+  "0",
+  "0x144fa6d7000000000000000000000000" + directexchange.address.substr(2, 100)
+);
+
+console.log(
+  "### Calling the directexchange updateOwner API to point to subchainbase"
+);
+sendtx(
+  mainaddress,
+  directexchange.address,
+  "0",
+  "0x880cdc31000000000000000000000000" + subchainbase.address.substr(2, 100)
 );
 
 //==========================================================================
@@ -228,7 +310,7 @@ registeropen();
 console.log("### Register OPEN is waiting for SCS ...");
 while (true) {
   let count = subchainbase.nodeCount();
-  if (count > 0) {
+  if (count > 2) {
     console.log("registertopool has enough scs " + count);
     break;
   }
@@ -241,7 +323,8 @@ registerclose();
 sleep(15000);
 
 console.log("### Register SCS Monitor");
-subchainRegisterAsMonitor(scsm, bmin);
+//subchainRegisterAsMonitor(scsm, bmin);
+subchainRegisterAsMonitor(scsm, bmin, "52.42.170.217:8548");
 
 //==========================================================================
 //==========================================================================
@@ -260,9 +343,8 @@ sleep(15000);
 //==========================================================================
 console.log("### Add the new LianWen channel to LianWen Board ...");
 
-var dechatmanagementaddr = "0x262c6ffc3b579fd932266ed6a646de5077ebe78b";
-var dechatmanagementAbi =
-  '[{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"boardList","outputs":[{"name":"subchainAddr","type":"address"},{"name":"deployLwSolAdmin","type":"address"},{"name":"marketableTokenAddr","type":"address"},{"name":"rpcIp","type":"bytes32"},{"name":"boardName","type":"bytes32"},{"name":"picPath","type":"bytes32"},{"name":"boardStatus","type":"uint256"},{"name":"exchangeRate","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"status","type":"uint256"},{"name":"subchainAddr","type":"address"}],"name":"updateBoardStatus","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"status","type":"uint256"}],"name":"getBoardlist","outputs":[{"name":"","type":"address[]"},{"name":"","type":"bytes32[]"},{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"subchainAddr","type":"address"},{"name":"deployLwSolAdmin","type":"address"},{"name":"marketableTokenAddr","type":"address"},{"name":"rpcIp","type":"bytes32"},{"name":"boardName","type":"bytes32"},{"name":"picPath","type":"bytes32"},{"name":"exchangeRate","type":"uint256"}],"name":"creatBoard","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":true,"stateMutability":"payable","type":"constructor"}]';
+var dechatmanagementaddr = "0xe75e07Fda4138a84c80b909e34C06243815a263C"; //"0x43277eb6048f3f1bdf2b4ee7c5f65fe2675fe28b"; //"0x262c6ffc3b579fd932266ed6a646de5077ebe78b";
+var dechatmanagementAbi = '[ { "constant": false, "inputs": [ { "name": "boardName", "type": "bytes32" }, { "name": "subchainAddr", "type": "address" } ], "name": "updateBoardName", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "boardList", "outputs": [ { "name": "subchainAddr", "type": "address", "value": "0xfd2749ff12b4794c6ba4b3a99a7d05af72e9437a" }, { "name": "deployLwSolAdmin", "type": "address", "value": "0xad9d80a7b374f23d2ddfa0febbd43edcad41c9a5" }, { "name": "marketableTokenAddr", "type": "address", "value": "0x94915fcb066ce1c965a8c8178e289b22d7824900" }, { "name": "rpcIp", "type": "bytes32", "value": "0x687474703a2f2f35322e34322e3137302e3231373a383534382f727063000000" }, { "name": "boardName", "type": "bytes32", "value": "0x79635f7465737431000000000000000000000000000000000000000000000000" }, { "name": "picPath", "type": "bytes32", "value": "0x777777772e746573742e636f6d2f746573742e696d6700000000000000000000" }, { "name": "boardStatus", "type": "uint256", "value": "1" }, { "name": "exchangeRate", "type": "uint256", "value": "10" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "status", "type": "uint256" }, { "name": "subchainAddr", "type": "address" } ], "name": "updateBoardStatus", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "status", "type": "uint256" } ], "name": "getBoardlist", "outputs": [ { "name": "", "type": "address[]", "value": [] }, { "name": "", "type": "bytes32[]", "value": [] }, { "name": "", "type": "uint256[]", "value": [] } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "subchainAddr", "type": "address" }, { "name": "deployLwSolAdmin", "type": "address" }, { "name": "marketableTokenAddr", "type": "address" }, { "name": "rpcIp", "type": "bytes32" }, { "name": "boardName", "type": "bytes32" }, { "name": "picPath", "type": "bytes32" }, { "name": "exchangeRate", "type": "uint256" } ], "name": "creatBoard", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "payable": true, "stateMutability": "payable", "type": "constructor" } ]';
 
 var dechatmanagementContract = chain3.mc.contract(
   JSON.parse(dechatmanagementAbi)
@@ -325,12 +407,18 @@ function registerclose() {
   sendtx(mainaddress, subchainbase.address, 0, "0x69f3576f");
 }
 
-function subchainRegisterAsMonitor(scsAddr, coins) {
+function subchainRegisterAsMonitor(scsAddr, coins, ip) {
+        var xContract=chain3.mc.contract(JSON.parse(subchainabi));
+        var xInstance=xContract.at(subchainbase.address);
+        var data=xInstance.registerAsMonitor.getData(scsAddr,ip);
+
+  console.log(data);
+
   sendtx(
     mainaddress,
     subchainbase.address,
     coins,
-    "0x4e592e2f000000000000000000000000" + scsAddr.substring(2)
+    data
   );
 }
 
@@ -366,7 +454,7 @@ function sendtx(src, tgtaddr, amount, strData) {
     from: src,
     value: chain3.toSha(amount, "mc"),
     to: tgtaddr,
-    gas: "2000000",
+    gas: "9000000",
     gasPrice: chain3.mc.gasPrice,
     data: strData
   });
@@ -408,8 +496,8 @@ function subchaindeploycode(baseaddr, subchainaddr, code, nonce) {
   sendshardingflagtx(
     baseaddr,
     subchainaddr,
-    //1000000000000000000000000,
-    0,
+    1000000,
+    //0,
     code,
     nonce
   );
@@ -418,10 +506,10 @@ function subchaindeploycode(baseaddr, subchainaddr, code, nonce) {
 function sendshardingflagtx(baseaddr, subchainaddr, amount, code, n) {
   chain3.mc.sendTransaction({
     from: baseaddr,
-    value: amount,
+    value: chain3.toSha(amount, "mc"),
     to: subchainaddr,
     gas: "0", //'200000',
-    gasPrice: chain3.mc.gasPrice,
+    gasPrice: 0,
     ShardingFlag: "0x1",
     data: code,
     nonce: n,
