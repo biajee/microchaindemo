@@ -88,7 +88,7 @@ var supply = 1000000;
 var exchangerate = 1;
 var directexchangeContract = chain3.mc.contract(JSON.parse(abi));
 var directexchange = directexchangeContract.new(supply, exchangerate, {
-  from: chain3.mc.accounts[0],
+  from: mainaddress,
   data: "0x" + bin,
   gas: "9000000"
 });
@@ -221,6 +221,8 @@ subchainbase = subchainbaseContract.at(
   chain3.mc.getTransactionReceipt(subchainbase.transactionHash).contractAddress
 );
 
+console.log("!!!!!!!!!!!!!!@@@@@@@@@@@@@@@@@@@@@" + subchainbase.BALANCE());
+
 //==========================================================================
 //==========================================================================
 console.log(
@@ -243,6 +245,14 @@ sendtx(
   "0x880cdc31000000000000000000000000" + subchainbase.address.substr(2, 100)
 );
 
+
+
+// add by frank
+sleep(12000); //wait 1 block
+console.log("@@@@@@IMPORTANT CHECK1 --- subchainbase.BALANCE(), must * 10^18" + subchainbase.BALANCE());
+console.log("@@@@@@IMPORTANT CHECK2 --- directexchange.owner(), must subchain address" + directexchange.owner());
+
+
 //==========================================================================
 //0xaE6E5aBe58B63Ab7129fF77c6d2c000F5b2F0244
 //0x8A6c516367EadB886B36197300DEaaB7BE5867DC
@@ -250,20 +260,21 @@ sendtx(
 //
 //==========================================================================
 console.log("### Sending MC to scs1, scs2, scs3 and scsm");
+
 scs1 = "0x6806344fd25bea9a038f5fe122bb6ac33eea7812";
-sendtx(mainaddress, scs1, 20);
+sendtx(mainaddress, scs1, 5);
 waitBalance(scs1, 20);
 
 scs2 = "0x21ad8520c9ddb6b982b9a01e915f8900a65560a3";
-sendtx(mainaddress, scs2, 20);
+sendtx(mainaddress, scs2, 5);
 waitBalance(scs2, 20);
 
 scs3 = "0x61f97cc6c1457f3bf31e249a6d68d1fc06298947";
-sendtx(mainaddress, scs3, 20);
+sendtx(mainaddress, scs3, 5);
 waitBalance(scs3, 20);
 
 scsm = "0xe543dd0656ed71984d31b9d18692fd6bc9ce43d0";
-sendtx(mainaddress, scsm, 20);
+sendtx(mainaddress, scsm, 5);
 waitBalance(scsm, 20);
 
 // scsm="0x3e0025B9fCDC70B7cf63A6c087345aFFE2Df7301";
@@ -331,7 +342,7 @@ subchainRegisterAsMonitor(scsm, bmin, "52.42.170.217:8548");
 //==========================================================================
 //==========================================================================
 console.log("### Waiting for the subchain initialization ...");
-sleep(40000);
+sleep(50000);
 
 console.log("### Deploying the lianwen subchain ...");
 var baseaddr = mainaddress;
@@ -345,7 +356,7 @@ sleep(15000);
 //==========================================================================
 console.log("### Add the new LianWen channel to LianWen Board ...");
 
-var dechatmanagementaddr = "0xe75e07Fda4138a84c80b909e34C06243815a263C"; //"0x43277eb6048f3f1bdf2b4ee7c5f65fe2675fe28b"; //"0x262c6ffc3b579fd932266ed6a646de5077ebe78b";
+var dechatmanagementaddr = "0xaf1c3d650aa2fa2c66349343f727dc37a8819283";//"0x2aA0708465f20828C59Be178681234e0F9aFaBb5";//"0xe75e07Fda4138a84c80b909e34C06243815a263C"; //"0x43277eb6048f3f1bdf2b4ee7c5f65fe2675fe28b"; //"0x262c6ffc3b579fd932266ed6a646de5077ebe78b";
 var dechatmanagementAbi = '[ { "constant": false, "inputs": [ { "name": "boardName", "type": "bytes32" }, { "name": "subchainAddr", "type": "address" } ], "name": "updateBoardName", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "", "type": "uint256" } ], "name": "boardList", "outputs": [ { "name": "subchainAddr", "type": "address", "value": "0xfd2749ff12b4794c6ba4b3a99a7d05af72e9437a" }, { "name": "deployLwSolAdmin", "type": "address", "value": "0xad9d80a7b374f23d2ddfa0febbd43edcad41c9a5" }, { "name": "marketableTokenAddr", "type": "address", "value": "0x94915fcb066ce1c965a8c8178e289b22d7824900" }, { "name": "rpcIp", "type": "bytes32", "value": "0x687474703a2f2f35322e34322e3137302e3231373a383534382f727063000000" }, { "name": "boardName", "type": "bytes32", "value": "0x79635f7465737431000000000000000000000000000000000000000000000000" }, { "name": "picPath", "type": "bytes32", "value": "0x777777772e746573742e636f6d2f746573742e696d6700000000000000000000" }, { "name": "boardStatus", "type": "uint256", "value": "1" }, { "name": "exchangeRate", "type": "uint256", "value": "10" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "status", "type": "uint256" }, { "name": "subchainAddr", "type": "address" } ], "name": "updateBoardStatus", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "name": "status", "type": "uint256" } ], "name": "getBoardlist", "outputs": [ { "name": "", "type": "address[]", "value": [] }, { "name": "", "type": "bytes32[]", "value": [] }, { "name": "", "type": "uint256[]", "value": [] } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "name": "subchainAddr", "type": "address" }, { "name": "deployLwSolAdmin", "type": "address" }, { "name": "marketableTokenAddr", "type": "address" }, { "name": "rpcIp", "type": "bytes32" }, { "name": "boardName", "type": "bytes32" }, { "name": "picPath", "type": "bytes32" }, { "name": "exchangeRate", "type": "uint256" } ], "name": "creatBoard", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "payable": true, "stateMutability": "payable", "type": "constructor" } ]';
 
 var dechatmanagementContract = chain3.mc.contract(
@@ -390,6 +401,9 @@ console.log("Subchain Base Address: " + subchainbase.address + "\n");
 sleep(1000);
 console.log("IP: 52.42.170.217\n");
 console.log("Port: 8548\n");
+
+console.log("@@@@@@IMPORTANT CHECK1 --- subchainbase.BALANCE(), must * 10^18" + subchainbase.BALANCE());
+console.log("@@@@@@IMPORTANT CHECK2 --- directexchange.owner(), must subchain address" + directexchange.owner());
 
 function registertopool(contractadd, scsaddress) {
   var registerdata =
