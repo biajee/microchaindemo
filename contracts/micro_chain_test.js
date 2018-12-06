@@ -337,7 +337,7 @@ sleep(15000);
 
 console.log("### Register SCS Monitor");
 //subchainRegisterAsMonitor(scsm, bmin);
-subchainRegisterAsMonitor(scsm, bmin, "52.42.170.217:8548");
+subchainRegisterAsMonitor(scsm, bmin, "54.187.22.2:8548");
 
 //==========================================================================
 //==========================================================================
@@ -366,7 +366,7 @@ var dechatmanagement = dechatmanagementContract.at(dechatmanagementaddr);
 
 var deployLwSolAdmin = mainaddress;
 var marketableTokenAddr = "0x94915fcb066ce1c965a8c8178e289b22d7824900";
-var rpcIp = "http://52.42.170.217:8548/rpc";
+var rpcIp = "http://54.187.22.2:8548/rpc";
 
 var boardName = "MoacDemoTest";
 const args = process.argv.slice(2);
@@ -375,7 +375,7 @@ if (args.length > 0) {
 }
 console.log("### Lianwen name: " + boardName);
 var picPath = "wwww.test.com/test.img";
-var num = 10;
+var num = exchangerate;
 
 creatBoard(
   createboardaddress,
@@ -399,7 +399,7 @@ console.log("Please go to testnet.moac.io to monitor the microchain.\n");
 sleep(1000);
 console.log("Subchain Base Address: " + subchainbase.address + "\n");
 sleep(1000);
-console.log("IP: 52.42.170.217\n");
+console.log("IP: 54.187.22.2\n");
 console.log("Port: 8548\n");
 
 console.log("@@@@@@IMPORTANT CHECK1 --- subchainbase.BALANCE(), must * 10^18" + subchainbase.BALANCE());
